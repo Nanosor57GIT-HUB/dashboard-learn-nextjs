@@ -2,21 +2,28 @@
 
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
+import { useDebouncedCallback } from 'use-debounce';
 
 export default function Search({ placeholder }: { placeholder: string }) { 
+  
+  //mettre à jour avec les parmètres de recherche (usePathname, useSearchParams, useRouter)
    const searchParams = useSearchParams();
    const pathname = usePathname();
    const { replace } = useRouter();
 
-  function handleSearch(term: string) {
+   const handleSearch = useDebouncedCallback((term) => {
+    console.log(`Searching... ${term}`);
     const params = new URLSearchParams(searchParams);
+    //réinitialise la pagination à 1 quand recherche dans la barre.
+    params.set('page', '1');
     if (term) {
       params.set('query', term);
     } else {
       params.delete('query');
     }
+    //synchroniser la recherche et la saisie dans l'url
     replace(`${pathname}?${params.toString()}`);
-  }
+  }, 500);
 
 
   return (
